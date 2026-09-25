@@ -1,6 +1,7 @@
 package com.exemple.backend.service;
 
-import com.exemple.backend.entity.CodeErreur;
+import com.exemple.backend.exception.CodeErreur;
+import com.exemple.backend.exception.RegleMetierException;
 import com.exemple.backend.entity.Exercice;
 import com.exemple.backend.entity.Presence;
 import com.exemple.backend.entity.Relecture;
