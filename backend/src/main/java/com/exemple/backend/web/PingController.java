@@ -1,9 +1,10 @@
-package com.exemple.backend;
+package com.exemple.backend.web;
 
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** Health check minimal utilise par le frontend pour verifier la communication. */
 @RestController
 public class PingController {
 
