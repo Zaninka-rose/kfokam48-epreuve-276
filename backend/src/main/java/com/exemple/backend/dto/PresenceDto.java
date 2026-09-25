@@ -1,6 +1,6 @@
-package com.exemple.backend.web.dto;
+package com.exemple.backend.dto;
 
-import com.exemple.backend.domain.SourcePresence;
+import com.exemple.backend.entity.SourcePresence;
 import java.time.OffsetDateTime;
 
 /** Presence telle que vue dans le tableau de bord formateur (EF10). */

@@ -1,10 +1,10 @@
 package com.exemple.backend.service;
 
-import com.exemple.backend.domain.CodeErreur;
-import com.exemple.backend.domain.Presence;
-import com.exemple.backend.domain.Session;
-import com.exemple.backend.domain.SourcePresence;
-import com.exemple.backend.domain.TentativeCode;
+import com.exemple.backend.entity.CodeErreur;
+import com.exemple.backend.entity.Presence;
+import com.exemple.backend.entity.Session;
+import com.exemple.backend.entity.SourcePresence;
+import com.exemple.backend.entity.TentativeCode;
 import com.exemple.backend.repository.PresenceRepository;
 import com.exemple.backend.repository.SessionRepository;
 import com.exemple.backend.repository.TentativeCodeRepository;

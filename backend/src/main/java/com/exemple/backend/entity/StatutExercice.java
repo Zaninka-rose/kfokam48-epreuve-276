@@ -1,4 +1,4 @@
-package com.exemple.backend.domain;
+package com.exemple.backend.entity;
 
 public enum StatutExercice {
 	/** Aucun relecteur eligible encore designe (RG13). */

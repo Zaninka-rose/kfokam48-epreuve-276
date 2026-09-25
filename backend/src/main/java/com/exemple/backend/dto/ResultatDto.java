@@ -1,4 +1,4 @@
-package com.exemple.backend.web.dto;
+package com.exemple.backend.dto;
 
 import java.time.OffsetDateTime;
 

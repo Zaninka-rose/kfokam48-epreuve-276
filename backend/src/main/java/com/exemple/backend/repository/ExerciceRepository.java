@@ -1,7 +1,7 @@
 package com.exemple.backend.repository;
 
-import com.exemple.backend.domain.Exercice;
-import com.exemple.backend.domain.StatutExercice;
+import com.exemple.backend.entity.Exercice;
+import com.exemple.backend.entity.StatutExercice;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

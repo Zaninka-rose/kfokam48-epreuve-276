@@ -1,4 +1,4 @@
-package com.exemple.backend.web;
+package com.exemple.backend.exception;
 
 import com.exemple.backend.service.RegleMetierException;
 import java.time.OffsetDateTime;

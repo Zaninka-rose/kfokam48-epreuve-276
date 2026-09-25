@@ -1,4 +1,4 @@
-package com.exemple.backend.domain;
+package com.exemple.backend.entity;
 
 /**
  * Codes d'erreur metier renvoyes dans l'enveloppe "Error" commune

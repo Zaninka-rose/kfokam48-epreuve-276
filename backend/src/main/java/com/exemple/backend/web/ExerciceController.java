@@ -1,9 +1,11 @@
 package com.exemple.backend.web;
 
-import com.exemple.backend.domain.Relecture;
+import com.exemple.backend.dto.ExerciceDto;
+import com.exemple.backend.dto.ExerciceInput;
+import com.exemple.backend.dto.ResultatDto;
+import com.exemple.backend.entity.Exercice;
+import com.exemple.backend.entity.Relecture;
 import com.exemple.backend.service.RelectureService;
-import com.exemple.backend.web.dto.ExerciceInput;
-import com.exemple.backend.web.dto.ResultatDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
@@ -35,23 +37,20 @@ public class ExerciceController {
 	public record DepotInput(@NotNull Long sessionId, @Valid ExerciceInput exercice) {
 	}
 
-	public record RelectureBody(@NotNull Long relecteurId) {
-	}
-
 	@PostMapping
-	public ResponseEntity<com.exemple.backend.web.dto.ExerciceDto> deposer(
+	public ResponseEntity<ExerciceDto> deposer(
 			@RequestHeader("X-Etudiant-Id") Long etudiantId,
 			@Valid @RequestBody DepotInput input) {
-		var exercice = relectureService.deposer(input.sessionId(), etudiantId, input.exercice().lien());
+		Exercice exercice = relectureService.deposer(input.sessionId(), etudiantId, input.exercice().lien());
 		return ResponseEntity.status(HttpStatus.CREATED).body(toDto(exercice, null));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<com.exemple.backend.web.dto.ExerciceDto> remplacer(
+	public ResponseEntity<ExerciceDto> remplacer(
 			@PathVariable Long id,
 			@RequestHeader("X-Etudiant-Id") Long etudiantId,
 			@Valid @RequestBody ExerciceInput input) {
-		var exercice = relectureService.remplacerLien(id, etudiantId, input.lien());
+		Exercice exercice = relectureService.remplacerLien(id, etudiantId, input.lien());
 		return ResponseEntity.ok(toDto(exercice, null));
 	}
 
@@ -67,8 +66,8 @@ public class ExerciceController {
 		return ResponseEntity.ok(new ResultatDto(id, relecture.getNote(), relecture.getCommentaire(), relecture.getRendueLe()));
 	}
 
-	static com.exemple.backend.web.dto.ExerciceDto toDto(com.exemple.backend.domain.Exercice exercice, Long relecteurId) {
-		return new com.exemple.backend.web.dto.ExerciceDto(exercice.getId(), exercice.getSession().getId(),
+	static ExerciceDto toDto(Exercice exercice, Long relecteurId) {
+		return new ExerciceDto(exercice.getId(), exercice.getSession().getId(),
 				exercice.getAuteurId(), exercice.getLien(), exercice.getStatut(), exercice.getDeposeLe(), relecteurId);
 	}
 }

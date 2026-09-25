@@ -1,10 +1,10 @@
 package com.exemple.backend.web;
 
-import com.exemple.backend.domain.Relecture;
+import com.exemple.backend.entity.Relecture;
 import com.exemple.backend.service.RelectureService;
-import com.exemple.backend.web.dto.ExerciceDto;
-import com.exemple.backend.web.dto.LigneTableauDto;
-import com.exemple.backend.web.dto.RelectureInput;
+import com.exemple.backend.dto.ExerciceDto;
+import com.exemple.backend.dto.LigneTableauDto;
+import com.exemple.backend.dto.RelectureInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

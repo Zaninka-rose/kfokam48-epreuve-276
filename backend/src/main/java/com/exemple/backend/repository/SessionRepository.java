@@ -1,6 +1,6 @@
 package com.exemple.backend.repository;
 
-import com.exemple.backend.domain.Session;
+import com.exemple.backend.entity.Session;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

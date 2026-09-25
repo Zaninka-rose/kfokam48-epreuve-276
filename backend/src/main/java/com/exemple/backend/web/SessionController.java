@@ -1,11 +1,11 @@
 package com.exemple.backend.web;
 
-import com.exemple.backend.domain.Presence;
-import com.exemple.backend.domain.Session;
+import com.exemple.backend.entity.Presence;
+import com.exemple.backend.entity.Session;
 import com.exemple.backend.service.RelectureService;
 import com.exemple.backend.service.SessionService;
-import com.exemple.backend.web.dto.PresenceDto;
-import com.exemple.backend.web.dto.SessionDto;
+import com.exemple.backend.dto.PresenceDto;
+import com.exemple.backend.dto.SessionDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;

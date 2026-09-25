@@ -1,6 +1,6 @@
-package com.exemple.backend.web.dto;
+package com.exemple.backend.dto;
 
-import com.exemple.backend.domain.StatutExercice;
+import com.exemple.backend.entity.StatutExercice;
 import java.time.OffsetDateTime;
 
 /** Exercice tel que vu par le formateur ou l'etudiant (le lien peut etre elide). */

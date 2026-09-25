@@ -1,6 +1,6 @@
 package com.exemple.backend.repository;
 
-import com.exemple.backend.domain.Relecture;
+import com.exemple.backend.entity.Relecture;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
