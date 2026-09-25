@@ -1,3 +1,10 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { TableauBord } from './tableau-bord/tableau-bord';
+
+export const routes: Routes = [
+	{
+		path: 'tableau-bord',
+		component: TableauBord,
+	},
+];

@@ -6,6 +6,7 @@ Versionnement : SemVer (MAJEUR.MINEUR.CORRECTIF).
 
 | Date | Version | Auteur | Type | Description |
 |---|---|---|---|---|
+| 25/09/2026 | 0.8.0 | Zaninka-rose | Fonctionnel | Issue #18 — écran formateur « tableau de bord » : saisie de session, GET /api/sessions/{id}/tableau via la couche API dédiée, lignes par étudiant (présences, exercices déposés avec statut, moyenne calculée sur les relectures rendues RG9, relectures en attente) ; route /tableau-bord, tests vitest (affichage, moyenne null, 404, réseau, validation). |
 | 25/09/2026 | 0.6.6 | Zaninka-rose | Fonctionnel | Issue #11 — EF12 clôture de session : 200 + marque session clôturée, dépôt et présence refusés (409 SESSION_CLOTUREE, RG10) ; vérifié aussi que le dépôt reste possible après simple expiration du code (§7). |
 | 25/09/2026 | 0.6.0 | Zaninka-rose | Fonctionnel | Issue #5 — EF1 ouverture de session : code unique généré, expiration à ouverture + 15 min (RG1), tests d'acceptation. Réparation des incohérences de fusion (CodeErreur/RegleMetierException repositionnés dans exception). |
 | 25/09/2026 | 0.5.1 | Zaninka-rose | Fonctionnel | Issue #4 — marquage de présence par code : tests d'intégration des trois critères d'acceptation (201 présence visible au tableau, 410 CODE_EXPIRE, 409 DEJA_PRESENT), code métier exposé dans l'enveloppe d'erreur, séquences IDENTITY recalées après le seed. |

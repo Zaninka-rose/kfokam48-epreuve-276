@@ -1,0 +1,78 @@
+<main class="page">
+	<section class="carte">
+		<h1>Tableau de bord formateur</h1>
+		<p class="sous-titre">
+			Présences, exercices déposés, moyennes et relectures en attente, par
+			étudiant (EF10). La moyenne est calculée uniquement sur les relectures
+			rendues (RG9) et le relecteur n'est visible que dans cet écran (RG6).
+		</p>
+
+		<form (submit)="consulter($event)">
+			<label for="sessionId">Identifiant de session</label>
+			<input
+				id="sessionId"
+				name="sessionId"
+				type="number"
+				min="1"
+				required
+				[value]="sessionId()"
+				(input)="sessionId.set($any($event.target).value)"
+				placeholder="ex. 1"
+			/>
+
+			@if (erreur()) {
+				<p class="ligne-statut statut-ko">❌ {{ erreur() }}</p>
+			}
+
+			<button
+				type="submit"
+				class="bouton"
+				[disabled]="etat() === 'en_cours' || !sessionId()"
+			>
+				{{ etat() === 'en_cours' ? 'Chargement…' : 'Consulter le tableau' }}
+			</button>
+		</form>
+
+		@if (etat() === 'affiche') {
+			<table class="tableau">
+				<thead>
+					<tr>
+						<th>Étudiant</th>
+						<th>Présences</th>
+						<th>Exercices déposés</th>
+						<th>Moyenne (RG9)</th>
+						<th>Relectures en attente</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (ligne of lignes(); track ligne.etudiantId) {
+						<tr>
+							<td>
+								{{ ligne.nom ?? ('Étudiant n°' + ligne.etudiantId) }}
+							</td>
+							<td class="nombre">{{ ligne.presences }}</td>
+							<td>
+								@if (ligne.exercices.length === 0) {
+									<span class="vide">Aucun</span>
+								} @else {
+									<ul class="exercices">
+										@for (exercice of ligne.exercices; track exercice.id) {
+											<li>
+												<a [href]="exercice.lien" target="_blank" rel="noopener"
+													>Exercice n°{{ exercice.id }}</a
+												>
+												<span class="statut">{{ libelleStatut(exercice.statut) }}</span>
+											</li>
+										}
+									</ul>
+								}
+							</td>
+							<td class="nombre">{{ formatMoyenne(ligne.moyenne) }}</td>
+							<td class="nombre">{{ ligne.relecturesEnAttente }}</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	</section>
+</main>
