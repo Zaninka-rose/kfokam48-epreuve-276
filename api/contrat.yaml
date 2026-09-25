@@ -1,120 +1,375 @@
 openapi: 3.0.3
 info:
-  title: mon-projet API
+  title: KFOKAM48 API — suivi de présence, exercices et relecture
   description: >
     Contrat d'interface entre le backend Spring Boot (/backend) et le frontend
     Angular (/frontend). Source de vérité unique : toute évolution de l'API
     commence par une modification de ce fichier, validée avant implémentation.
-  version: 0.1.0
+    Les 5 opérations imposées sont : POST /api/sessions, POST /api/presences,
+    POST /api/exercices, POST /api/relectures/{idExercice}, GET /api/tableau.
+  version: 0.2.0
   contact:
-    name: Équipe mon-projet
+    name: Équipe KF48-276
   license:
     name: Propriétaire
 servers:
   - url: http://localhost:8080
     description: Backend local (./mvnw spring-boot:run)
-# API publique par défaut (security vide) : les endpoints sécurisés déclareront
-# explicitement un securityScheme (ex. bearerAuth) lorsqu'il sera implémenté.
+# API publique par défaut : l'identification provisoire passe par les en-têtes
+# X-Etudiant-Id / X-Relecteur-Id / X-Formateur-Id en attendant le mécanisme final.
 security: []
 tags:
-  - name: Items
-    description: Ressource d'exemple — à remplacer par les ressources du domaine réel.
+  - name: Sessions
+    description: Ouverture, présence et clôture des sessions de cours (EF1, EF2, EF4, EF11, EF12)
+  - name: Exercices
+    description: Dépôt, remplacement et résultat des exercices (EF5, EF6, EF9)
+  - name: Relectures
+    description: Envoi d'une relecture par le relecteur désigné (EF8)
+  - name: Tableau
+    description: Vue formateur — présences, dépôts, moyennes, relectures en attente (EF10)
 paths:
-  /api/items:
-    get:
-      tags: [Items]
-      operationId: listItems
-      summary: Lister les items (pagination)
-      parameters:
-        - name: page
-          in: query
-          description: Numéro de page (0-based)
-          schema: { type: integer, minimum: 0, default: 0 }
-        - name: size
-          in: query
-          description: Taille de page
-          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
-      responses:
-        "200":
-          description: Page d'items
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ItemPage"
-        "400":
-          $ref: "#/components/responses/ValidationError"
+  /api/sessions:
     post:
-      tags: [Items]
-      operationId: createItem
-      summary: Créer un item
+      tags: [Sessions]
+      operationId: ouvrirSession
+      summary: Ouvrir une session et obtenir un code de présence (EF1)
+      description: >
+        Le formateur ouvre une session. Le système génère un code valable
+        15 minutes (RG1). La session est créée non clôturée.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ItemInput"
+              $ref: "#/components/schemas/SessionOuvertureInput"
       responses:
         "201":
-          description: Item créé
+          description: Session ouverte
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+                $ref: "#/components/schemas/Session"
         "400":
           $ref: "#/components/responses/ValidationError"
-  /api/items/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema: { type: integer, format: int64 }
-    get:
-      tags: [Items]
-      operationId: getItem
-      summary: Récupérer un item par son identifiant
-      responses:
-        "200":
-          description: Item trouvé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Item"
-        "404":
-          $ref: "#/components/responses/NotFound"
-    put:
-      tags: [Items]
-      operationId: updateItem
-      summary: Modifier un item existant
+
+  /api/presences:
+    post:
+      tags: [Sessions]
+      operationId: marquerPresence
+      summary: Marquer la présence d'un étudiant avec un code (EF2)
+      description: >
+        L'étudiant saisit le code affiché par le formateur. Refus si le code
+        est inconnu, expiré (RG1/RG2), si l'étudiant est déjà présent (EF4)
+        ou bloqué après 5 erreurs consécutives (RG3). Une présence créée
+        peut déclencher l'assignation de relecteurs en attente (RG13).
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ItemInput"
+              $ref: "#/components/schemas/PresenceInput"
       responses:
-        "200":
-          description: Item mis à jour
+        "201":
+          description: Présence enregistrée
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+                $ref: "#/components/schemas/Presence"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          description: Code de présence inconnu
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            Présence déjà marquée (`DEJA_PRESENT`, EF4) ou session clôturée
+            (`SESSION_CLOTUREE`, EF12) — voir `code`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "410":
+          description: Code expiré (`CODE_EXPIRE`, RG1/RG2)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Trop de tentatives erronées (`QUOTA_TENTATIVES`, RG3)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/sessions/{idSession}/presences:
+    post:
+      tags: [Sessions]
+      operationId: ajouterPresenceManuelle
+      summary: Ajouter une présence manuelle (EF11)
+      description: >
+        Le formateur ajoute la présence d'un étudiant ; la présence est
+        marquée `source: FORMATEUR` (RG12).
+      parameters:
+        - $ref: "#/components/parameters/IdSession"
+        - $ref: "#/components/parameters/XFormateurId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PresenceManuelleInput"
+      responses:
+        "201":
+          description: Présence ajoutée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Presence"
         "400":
           $ref: "#/components/responses/ValidationError"
         "404":
           $ref: "#/components/responses/NotFound"
-    delete:
-      tags: [Items]
-      operationId: deleteItem
-      summary: Supprimer un item
+        "409":
+          description: Présence déjà marquée (`DEJA_PRESENT`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/sessions/{idSession}/cloture:
+    post:
+      tags: [Sessions]
+      operationId: cloturerSession
+      summary: Clôturer une session (EF12)
+      description: >
+        Après clôture, plus aucun dépôt d'exercice ni relecture n'est possible
+        sur cette session (RG10). L'expiration du code (RG1/RG2) ne concerne
+        que la présence.
+      parameters:
+        - $ref: "#/components/parameters/IdSession"
+        - $ref: "#/components/parameters/XFormateurId"
       responses:
-        "204":
-          description: Item supprimé
+        "200":
+          description: Session clôturée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /api/exercices:
+    post:
+      tags: [Exercices]
+      operationId: deposerExercice
+      summary: Déposer le lien d'un exercice (EF5)
+      description: >
+        L'étudiant dépose le lien de son exercice. Statut initial :
+        `EN_ATTENTE_ASSIGNATION` ou `EN_ATTENTE_RELECTURE` si un relecteur
+        est immédiatement disponible. Un seul exercice par étudiant et par
+        session.
+      parameters:
+        - $ref: "#/components/parameters/XEtudiantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciceDepotInput"
+      responses:
+        "201":
+          description: Exercice déposé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exercice"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: |
+            Session clôturée (`SESSION_CLOTUREE`, RG10) ou exercice déjà
+            déposé par cet étudiant sur cette session — voir `code`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/exercices/{idExercice}:
+    put:
+      tags: [Exercices]
+      operationId: remplacerLienExercice
+      summary: Remplacer le lien d'un exercice (EF6)
+      description: >
+        Autorisé tant qu'aucune relecture n'a commencé (RG11) ; refusé après
+        (`RELECTURE_DEJA_COMMENCEE`). Seul l'auteur peut remplacer son lien.
+      parameters:
+        - $ref: "#/components/parameters/IdExercice"
+        - $ref: "#/components/parameters/XEtudiantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciceRemplacementInput"
+      responses:
+        "200":
+          description: Lien remplacé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exercice"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          description: L'appelant n'est pas l'auteur de l'exercice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Relecture déjà commencée (`RELECTURE_DEJA_COMMENCEE`, RG11)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/exercices/{idExercice}/resultat:
+    get:
+      tags: [Exercices]
+      operationId: consulterResultat
+      summary: Consulter sa note et son commentaire (EF9)
+      description: >
+        Réservé à l'auteur. La réponse ne contient jamais l'identité du
+        relecteur (RG6). 404 tant qu'aucune relecture n'est rendue.
+      parameters:
+        - $ref: "#/components/parameters/IdExercice"
+        - $ref: "#/components/parameters/XEtudiantId"
+      responses:
+        "200":
+          description: Résultat de la relecture (anonyme)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resultat"
+        "404":
+          description: Exercice inconnu ou relecture pas encore rendue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/relectures/{idExercice}:
+    post:
+      tags: [Relectures]
+      operationId: envoyerRelecture
+      summary: Envoyer une relecture (note et commentaire) (EF8)
+      description: >
+        Le relecteur désigné envoie note (entière, 0–20 — RG7) et commentaire.
+        Refus si l'appelant est l'auteur (RG4, 403) ou si la relecture est
+        déjà rendue — elle est définitive (RG8, 409).
+      parameters:
+        - $ref: "#/components/parameters/IdExercice"
+        - $ref: "#/components/parameters/XRelecteurId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelectureInput"
+      responses:
+        "200":
+          description: Relecture enregistrée (définitive)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resultat"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          description: Un étudiant ne peut pas relire son propre exercice (RG4)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Aucune relecture attendue sur cet exercice pour ce relecteur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Relecture déjà rendue (`RELECTURE_DEJA_RENDUE`, RG8)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/tableau:
+    get:
+      tags: [Tableau]
+      operationId: consulterTableau
+      summary: Consulter le tableau de bord formateur (EF10)
+      description: >
+        Pour chaque étudiant de la session : nombre de présences, exercices
+        déposés, moyenne des notes reçues, relectures en attente. Le
+        `relecteurId` est visible ici (formateur) mais jamais dans les
+        réponses de l'étudiant (RG6).
+      parameters:
+        - $ref: "#/components/parameters/IdSession"
+        - $ref: "#/components/parameters/XFormateurId"
+      responses:
+        "200":
+          description: Tableau de bord
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LigneTableau"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 components:
+  parameters:
+    IdSession:
+      name: idSession
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    IdExercice:
+      name: idExercice
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    XEtudiantId:
+      name: X-Etudiant-Id
+      in: header
+      required: true
+      description: Identification provisoire de l'étudiant (remplacée par le mécanisme final)
+      schema: { type: integer, format: int64 }
+    XRelecteurId:
+      name: X-Relecteur-Id
+      in: header
+      required: true
+      description: Identification provisoire du relecteur
+      schema: { type: integer, format: int64 }
+    XFormateurId:
+      name: X-Formateur-Id
+      in: header
+      required: true
+      description: Identification provisoire du formateur
+      schema: { type: integer, format: int64 }
+
   responses:
     ValidationError:
-      description: Requête invalide (échec de validation des données)
+      description: Requête invalide (échec de validation des données, B4)
       content:
         application/json:
           schema:
@@ -125,53 +380,169 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+
   schemas:
-    Item:
+    SessionOuvertureInput:
       type: object
-      description: Ressource d'exemple (à remplacer par le domaine réel).
-      required: [id, name, createdAt]
+      required: [formateurId]
       properties:
-        id:
+        formateurId:
           type: integer
           format: int64
-        name:
+
+    Session:
+      type: object
+      required: [id, formateurId, code, ouverture, expirationCode, cloturee]
+      properties:
+        id: { type: integer, format: int64 }
+        formateurId: { type: integer, format: int64 }
+        code:
+          type: string
+          maxLength: 10
+          description: Code de présence généré, valable 15 minutes (RG1)
+        ouverture: { type: string, format: date-time }
+        expirationCode: { type: string, format: date-time }
+        cloturee: { type: boolean }
+
+    PresenceInput:
+      type: object
+      required: [code, etudiantId]
+      properties:
+        code:
           type: string
           minLength: 1
-          maxLength: 100
-        description:
-          type: string
-          nullable: true
-        createdAt:
-          type: string
-          format: date-time
-          description: Date de création (ISO 8601, UTC)
-    ItemInput:
+          maxLength: 10
+        etudiantId: { type: integer, format: int64 }
+
+    PresenceManuelleInput:
       type: object
-      required: [name]
+      required: [etudiantId]
       properties:
-        name:
+        etudiantId: { type: integer, format: int64 }
+
+    SourcePresence:
+      type: string
+      enum: [ETUDIANT, FORMATEUR]
+      description: Origine de la présence (RG12)
+
+    Presence:
+      type: object
+      required: [id, sessionId, etudiantId, horodatage, source]
+      properties:
+        id: { type: integer, format: int64 }
+        sessionId: { type: integer, format: int64 }
+        etudiantId: { type: integer, format: int64 }
+        horodatage: { type: string, format: date-time }
+        source: { $ref: "#/components/schemas/SourcePresence" }
+
+    ExerciceDepotInput:
+      type: object
+      required: [sessionId, lien]
+      properties:
+        sessionId: { type: integer, format: int64 }
+        lien:
           type: string
           minLength: 1
-          maxLength: 100
-        description:
+          maxLength: 500
+
+    ExerciceRemplacementInput:
+      type: object
+      required: [lien]
+      properties:
+        lien:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    StatutExercice:
+      type: string
+      enum: [EN_ATTENTE_ASSIGNATION, EN_ATTENTE_RELECTURE, RELUE]
+      description: Machine à états de l'exercice (EF5, RG9, RG13)
+
+    Exercice:
+      type: object
+      required: [id, sessionId, auteurId, lien, statut, deposeLe]
+      properties:
+        id: { type: integer, format: int64 }
+        sessionId: { type: integer, format: int64 }
+        auteurId: { type: integer, format: int64 }
+        lien: { type: string, maxLength: 500 }
+        statut: { $ref: "#/components/schemas/StatutExercice" }
+        deposeLe: { type: string, format: date-time }
+        relecteurId:
+          type: integer
+          format: int64
+          nullable: true
+          description: Visible uniquement dans le tableau formateur (RG6)
+
+    RelectureInput:
+      type: object
+      required: [note, commentaire]
+      properties:
+        note:
+          type: integer
+          minimum: 0
+          maximum: 20
+          description: Note entière (RG7)
+        commentaire:
+          type: string
+          minLength: 1
+          maxLength: 2000
+
+    Resultat:
+      type: object
+      description: Note et commentaire tels que vus par l'auteur — sans relecteur (RG6)
+      required: [exerciceId, note, commentaire, rendueLe]
+      properties:
+        exerciceId: { type: integer, format: int64 }
+        note: { type: integer, minimum: 0, maximum: 20 }
+        commentaire: { type: string }
+        rendueLe: { type: string, format: date-time }
+
+    LigneTableau:
+      type: object
+      required: [etudiantId, presences, exercices, relecturesEnAttente]
+      properties:
+        etudiantId: { type: integer, format: int64 }
+        nom:
           type: string
           nullable: true
-    ItemPage:
-      type: object
-      required: [content, page, size, totalElements]
-      properties:
-        content:
+        presences: { type: integer, minimum: 0 }
+        exercices:
           type: array
           items:
-            $ref: "#/components/schemas/Item"
-        page: { type: integer, minimum: 0 }
-        size: { type: integer, minimum: 1 }
-        totalElements: { type: integer, minimum: 0 }
+            $ref: "#/components/schemas/Exercice"
+        moyenne:
+          type: number
+          format: double
+          nullable: true
+          description: Moyenne des notes reçues, null si aucune relecture rendue
+        relecturesEnAttente: { type: integer, minimum: 0 }
+
+    CodeErreur:
+      type: string
+      enum:
+        - CODE_EXPIRE
+        - DEJA_PRESENT
+        - QUOTA_TENTATIVES
+        - CODE_INCONNU
+        - SESSION_CLOTUREE
+        - RELECTURE_DEJA_COMMENCEE
+        - AUTEUR_NON_ELIGIBLE
+        - RELECTURE_DEJA_RENDUE
+        - INTROUVABLE
+      description: Codes métier portés par l'enveloppe d'erreur (ENF3)
+
     Error:
       type: object
-      description: Enveloppe d'erreur commune à toutes les réponses en échec.
-      required: [status, message, timestamp]
+      description: Enveloppe d'erreur commune à toutes les réponses en échec (ENF3)
+      required: [status, code, message, timestamp]
       properties:
         status: { type: integer, description: Code HTTP }
+        code: { $ref: "#/components/schemas/CodeErreur" }
         message: { type: string }
+        details:
+          type: array
+          items: { type: string }
+          description: Présent uniquement pour les erreurs de validation
         timestamp: { type: string, format: date-time }

@@ -7,6 +7,7 @@ Versionnement : SemVer (MAJEUR.MINEUR.CORRECTIF).
 | Date | Version | Auteur | Type | Description |
 |---|---|---|---|---|
 | 25/09/2026 | 0.5.1 | <Nom, prénom> | Fonctionnel | Issue #4 — marquage de présence par code : tests d'intégration des trois critères d'acceptation (201 présence visible au tableau, 410 CODE_EXPIRE, 409 DEJA_PRESENT), code métier exposé dans l'enveloppe d'erreur, séquences IDENTITY recalées après le seed. |
+| 25/09/2026 | 0.5.0 | <Nom, prénom> | Décision | Contrat OpenAPI complété (v0.2.0) : les 5 opérations imposées (POST /api/sessions, POST /api/presences, POST /api/exercices, POST /api/relectures/{idExercice}, GET /api/tableau) plus clôture, présence manuelle, remplacement de lien et résultat ; enveloppe d'erreur enrichie du code métier (ENF3). |
 | 25/09/2026 | 0.4.1 | <Nom, prénom> | Fonctionnel | Données de démonstration au démarrage : 1 promotion, 10 étudiants, session ouverte avec code valide 15 min (V2__seed.sql relative à l'horodatage) ; test d'intégration du seed. |
 | 25/09/2026 | 0.4.0 | <Nom, prénom> | Technique | Squelettes conformes aux contraintes de dépôt : packages backend renommés (entity/dto/exception), driver PostgreSQL + profil dédié et docker-compose, couche API dédiée côté frontend (api/client.ts) avec page de vérification, README d'installation (B1, B3, F1, F2). |
 | 25/09/2026 | 0.3.0 | <Nom, prénom> | Fonctionnel | Squelette backend : couches contrôleur/service/repository, entités et migrations Flyway (sessions, présences, exercices, relectures), gestion centralisée des erreurs (B3, B4, B5). |
