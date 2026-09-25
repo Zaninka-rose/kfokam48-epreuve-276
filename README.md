@@ -8,7 +8,7 @@ Projet full-stack : backend Spring Boot + frontend Angular, guidés par un contr
 |---|---|
 | docs/ | Cahier des charges, journal de projet, diagrammes |
 | api/ | Contrat OpenAPI (`contrat.yaml`) — source de vérité de l'interface |
-| backend/ | API REST Spring Boot (Java 21+, Maven, mvnw) |
+| backend/ | API REST Spring Boot (Java 17+, Maven, mvnw) |
 | frontend/ | Application Angular 22 |
 
 ## Démarrage local
