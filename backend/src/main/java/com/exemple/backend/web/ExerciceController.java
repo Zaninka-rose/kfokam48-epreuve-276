@@ -7,7 +7,9 @@ import com.exemple.backend.entity.Exercice;
 import com.exemple.backend.entity.Relecture;
 import com.exemple.backend.service.RelectureService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +36,15 @@ public class ExerciceController {
 		this.relectureService = relectureService;
 	}
 
-	public record DepotInput(@NotNull Long sessionId, @Valid ExerciceInput exercice) {
+	public record DepotInput(@NotNull Long sessionId, @NotBlank @Size(max = 500) String lien) {
 	}
 
 	@PostMapping
 	public ResponseEntity<ExerciceDto> deposer(
 			@RequestHeader("X-Etudiant-Id") Long etudiantId,
 			@Valid @RequestBody DepotInput input) {
-		Exercice exercice = relectureService.deposer(input.sessionId(), etudiantId, input.exercice().lien());
+		// Corps plat conforme au contrat (ExerciceDepotInput) : { sessionId, lien }.
+		Exercice exercice = relectureService.deposer(input.sessionId(), etudiantId, input.lien());
 		return ResponseEntity.status(HttpStatus.CREATED).body(toDto(exercice, null));
 	}
 

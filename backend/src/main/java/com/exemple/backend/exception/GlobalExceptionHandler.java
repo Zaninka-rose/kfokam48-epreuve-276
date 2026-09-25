@@ -5,6 +5,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,6 +37,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest()
 				.body(new ErrorDto(HttpStatus.BAD_REQUEST.value(), null, "Requete invalide",
 						OffsetDateTime.now().toString(), details));
+	}
+
+	@ExceptionHandler({ MissingRequestHeaderException.class, MissingServletRequestParameterException.class })
+	public ResponseEntity<ErrorDto> requeteIncomplete(Exception ex) {
+		return ResponseEntity.badRequest()
+				.body(new ErrorDto(HttpStatus.BAD_REQUEST.value(), null, ex.getMessage(),
+						OffsetDateTime.now().toString(), null));
 	}
 
 	@ExceptionHandler(Exception.class)
