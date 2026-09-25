@@ -1,0 +1,48 @@
+<main class="page">
+	<section class="carte">
+		<h1>Ouvrir une session</h1>
+		<p class="sous-titre">
+			Le formateur ouvre une session ; un code de présence valable 15 minutes est
+			généré (EF1, RG1).
+		</p>
+
+		@if (etat() === 'ouverte' && session(); as s) {
+			<p class="ligne-statut statut-ok">✅ Session n°{{ s.id }} ouverte</p>
+			<dl class="details-session">
+				<dt>Code de présence</dt>
+				<dd><code class="code">{{ s.code }}</code></dd>
+				<dt>Expiration du code</dt>
+				<dd>{{ s.expirationCode }}</dd>
+			</dl>
+			<button type="button" class="bouton" (click)="etat.set('formulaire')">
+				Ouvrir une autre session
+			</button>
+		} @else {
+			<form (submit)="soumettre($event)">
+				<label for="formateurId">Identifiant formateur</label>
+				<input
+					id="formateurId"
+					name="formateurId"
+					type="number"
+					min="1"
+					required
+					[value]="formateurId()"
+					(input)="formateurId.set($any($event.target).value)"
+					placeholder="ex. 1"
+				/>
+
+				@if (erreur()) {
+					<p class="ligne-statut statut-ko">❌ {{ erreur() }}</p>
+				}
+
+				<button
+					type="submit"
+					class="bouton"
+					[disabled]="etat() === 'en_cours' || !formateurId()"
+				>
+					{{ etat() === 'en_cours' ? 'Ouverture…' : 'Ouvrir la session' }}
+				</button>
+			</form>
+		}
+	</section>
+</main>

@@ -13,6 +13,22 @@ export interface PingResponse {
 	service: string;
 }
 
+/** Corps de POST /api/sessions (EF1) — voir SessionOuvertureInput du contrat. */
+export interface OuvrirSessionInput {
+	formateurId: number;
+}
+
+/** Session renvoyée par POST /api/sessions — voir schema Session du contrat. */
+export interface Session {
+	id: number;
+	formateurId: number;
+	/** Code de présence généré, valable 15 minutes (RG1). */
+	code: string;
+	ouverture: string;
+	expirationCode: string;
+	cloturee: boolean;
+}
+
 /** Exercice tel que vu par le formateur (relecteurId visible, RG6). */
 export interface Exercice {
 	id: number;
@@ -57,6 +73,11 @@ async function request<T>(chemin: string, init?: RequestInit): Promise<T> {
 
 export const api = {
 	ping: () => request<PingResponse>('/ping'),
+	ouvrirSession: (entree: OuvrirSessionInput) =>
+		request<Session>('/sessions', {
+			method: 'POST',
+			body: JSON.stringify(entree),
+		}),
 	tableau: (sessionId: number) =>
 		request<LigneTableau[]>(`/sessions/${sessionId}/tableau`),
 };
