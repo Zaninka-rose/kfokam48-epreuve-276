@@ -23,6 +23,12 @@ cd frontend && npm install && npm start
 
 Le serveur de dev Angular proxifie les appels `/api` vers http://localhost:8080 (voir `frontend/proxy.conf.json`). Vérification : la page d'accueil du frontend appelle `GET /api/ping` du backend et affiche son état.
 
+### Données de démonstration
+
+Au premier démarrage, la migration Flyway `V2__seed.sql` charge automatiquement : 1 promotion (KFOKAM48), 10 étudiants et 1 session déjà ouverte avec le code de présence **`DEMO1234`**, valide 15 minutes (RG1). Aucune action manuelle n'est requise après `docker compose up`.
+
+Avec la base H2 en mémoire (défaut), ces données sont recréées à chaque lancement. Avec PostgreSQL (volume persistant), la session de démo correspond au tout premier démarrage ; régénérer avec `docker compose down -v`.
+
 ## Architecture
 
 | Dossier | Contenu |
