@@ -36,7 +36,9 @@ public class RelectureController {
 			@RequestHeader("X-Relecteur-Id") Long relecteurId,
 			@Valid @RequestBody RelectureInput input) {
 		Relecture rendue = relectureService.rendre(exerciceId, relecteurId, input.note(), input.commentaire());
-		return ResponseEntity.ok(new ResultatLight(rendue.getExercice().getId(), rendue.getNote(), rendue.getRendueLe()));
+		// Reponse conforme au schema Resultat du contrat (RG6 : sans relecteurId).
+		return ResponseEntity.ok(new ResultatLight(rendue.getExercice().getId(), rendue.getNote(),
+				rendue.getCommentaire(), rendue.getRendueLe()));
 	}
 
 	@GetMapping("/sessions/{id}/tableau")
@@ -54,6 +56,6 @@ public class RelectureController {
 		return relectureService.relecteurDe(exerciceId);
 	}
 
-	public record ResultatLight(Long exerciceId, int note, java.time.OffsetDateTime rendueLe) {
+	public record ResultatLight(Long exerciceId, int note, String commentaire, java.time.OffsetDateTime rendueLe) {
 	}
 }

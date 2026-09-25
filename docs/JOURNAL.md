@@ -6,6 +6,7 @@ Versionnement : SemVer (MAJEUR.MINEUR.CORRECTIF).
 
 | Date | Version | Auteur | Type | Description |
 |---|---|---|---|---|
+| 25/09/2026 | 0.6.3 | <Nom, prénom> | Fonctionnel | Issue #8 — EF8 envoi de la relecture : 200 avec note/commentaire, note entière 0–20 (RG7), refus 403 de l'auteur (RG4), 409 RELECTURE_DEJA_RENDUE définitive (RG8). L'assignation est mutée en relecture rendue (contrainte d'unicité respectée) et la réponse suit le schéma Resultat du contrat. |
 | 25/09/2026 | 0.5.1 | <Nom, prénom> | Fonctionnel | Issue #4 — marquage de présence par code : tests d'intégration des trois critères d'acceptation (201 présence visible au tableau, 410 CODE_EXPIRE, 409 DEJA_PRESENT), code métier exposé dans l'enveloppe d'erreur, séquences IDENTITY recalées après le seed. |
 | 25/09/2026 | 0.5.0 | <Nom, prénom> | Décision | Contrat OpenAPI complété (v0.2.0) : les 5 opérations imposées (POST /api/sessions, POST /api/presences, POST /api/exercices, POST /api/relectures/{idExercice}, GET /api/tableau) plus clôture, présence manuelle, remplacement de lien et résultat ; enveloppe d'erreur enrichie du code métier (ENF3). |
 | 25/09/2026 | 0.4.1 | <Nom, prénom> | Fonctionnel | Données de démonstration au démarrage : 1 promotion, 10 étudiants, session ouverte avec code valide 15 min (V2__seed.sql relative à l'horodatage) ; test d'intégration du seed. |

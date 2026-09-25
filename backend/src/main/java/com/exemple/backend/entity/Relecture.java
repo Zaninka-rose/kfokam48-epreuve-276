@@ -52,6 +52,13 @@ public class Relecture {
 		this.rendueLe = rendueLe;
 	}
 
+	/** EF8/RG8 : fait passer l'assignation a l'etat rendu, de facon definitive. */
+	public void rendre(int note, String commentaire) {
+		this.note = note;
+		this.commentaire = commentaire;
+		this.rendueLe = OffsetDateTime.now();
+	}
+
 	public Long getId() {
 		return id;
 	}

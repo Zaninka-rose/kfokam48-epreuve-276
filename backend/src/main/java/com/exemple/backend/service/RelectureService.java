@@ -107,9 +107,10 @@ public class RelectureService {
 		if (exercice.getStatut() == StatutExercice.RELUE) {
 			throw new RegleMetierException(CodeErreur.RELECTURE_DEJA_RENDUE, "Relecture deja rendue, elle est definitive");
 		}
-		Relecture rendue = new Relecture(exercice, relecteurId, note, commentaire, OffsetDateTime.now());
-		relectures.delete(relecture);
-		Relecture enregistree = relectures.save(rendue);
+		// RG8 : la relecture d'assignation est mutee en relecture rendue
+		// (l'index unique uq_relecture_exercice interdit une seconde ligne).
+		relecture.rendre(note, commentaire);
+		Relecture enregistree = relectures.save(relecture);
 		exercice.marquerRelue();
 		return enregistree;
 	}
