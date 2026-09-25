@@ -1,0 +1,129 @@
+.page {
+	min-height: 100dvh;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 3rem 1rem;
+	box-sizing: border-box;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	background: oklch(19.37% 0.006 300.98);
+	color: oklch(95% 0 0);
+	margin: 0;
+}
+
+.carte {
+	width: 100%;
+	max-width: 60rem;
+	padding: 2rem;
+	border-radius: 1rem;
+	background: oklch(25% 0.01 300.98);
+	box-shadow: 0 1rem 3rem rgb(0 0 0 / 0.4);
+}
+
+.carte h1 {
+	font-size: 1.5rem;
+	font-weight: 500;
+	margin: 0 0 0.5rem;
+}
+
+.sous-titre {
+	margin: 0 0 1.5rem;
+	color: oklch(75% 0.01 300.98);
+}
+
+label {
+	display: block;
+	margin-bottom: 0.25rem;
+	font-weight: 500;
+}
+
+input {
+	width: 100%;
+	max-width: 16rem;
+	box-sizing: border-box;
+	padding: 0.6rem 0.75rem;
+	border-radius: 0.5rem;
+	border: 1px solid oklch(40% 0.01 300.98);
+	background: oklch(30% 0.01 300.98);
+	color: inherit;
+	font: inherit;
+}
+
+.bouton {
+	margin-top: 1rem;
+	padding: 0.6rem 1rem;
+	border: none;
+	border-radius: 0.5rem;
+	background: oklch(60% 0.15 300.98);
+	color: oklch(15% 0.01 300.98);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.bouton:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.ligne-statut {
+	margin-top: 1rem;
+	padding: 0.75rem 1rem;
+	border-radius: 0.5rem;
+	background: oklch(30% 0.01 300.98);
+}
+
+.statut-ko {
+	color: oklch(80% 0.15 25);
+}
+
+.tableau {
+	width: 100%;
+	margin-top: 2rem;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+}
+
+.tableau th,
+.tableau td {
+	padding: 0.6rem 0.75rem;
+	border-bottom: 1px solid oklch(35% 0.01 300.98);
+	text-align: left;
+	vertical-align: top;
+}
+
+.tableau th {
+	font-weight: 600;
+	color: oklch(75% 0.01 300.98);
+}
+
+.nombre {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.exercices {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.exercices a {
+	color: oklch(80% 0.1 300.98);
+}
+
+.statut {
+	display: inline-block;
+	margin-left: 0.5rem;
+	padding: 0.05rem 0.5rem;
+	border-radius: 999px;
+	background: oklch(35% 0.01 300.98);
+	font-size: 0.8rem;
+}
+
+.vide {
+	color: oklch(60% 0.01 300.98);
+}

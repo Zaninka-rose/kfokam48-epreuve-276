@@ -29,6 +29,27 @@ export interface Session {
 	cloturee: boolean;
 }
 
+/** Exercice tel que vu par le formateur (relecteurId visible, RG6). */
+export interface Exercice {
+	id: number;
+	sessionId: number;
+	auteurId: number;
+	lien: string;
+	statut: 'EN_ATTENTE_ASSIGNATION' | 'EN_ATTENTE_RELECTURE' | 'RELUE';
+	deposeLe: string;
+	relecteurId: number | null;
+}
+
+/** Ligne du tableau de bord formateur (EF10) — voir LigneTableauDto. */
+export interface LigneTableau {
+	etudiantId: number;
+	nom: string | null;
+	presences: number;
+	exercices: Exercice[];
+	moyenne: number | null;
+	relecturesEnAttente: number;
+}
+
 export class ApiError extends Error {
 	constructor(
 		public readonly status: number,
@@ -57,4 +78,6 @@ export const api = {
 			method: 'POST',
 			body: JSON.stringify(entree),
 		}),
+	tableau: (sessionId: number) =>
+		request<LigneTableau[]>(`/sessions/${sessionId}/tableau`),
 };
