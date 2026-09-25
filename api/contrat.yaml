@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: mon-projet API
+  description: >
+    Contrat d'interface entre le backend Spring Boot (/backend) et le frontend
+    Angular (/frontend). Source de vérité unique : toute évolution de l'API
+    commence par une modification de ce fichier, validée avant implémentation.
+  version: 0.1.0
+  contact:
+    name: Équipe mon-projet
+  license:
+    name: Propriétaire
+servers:
+  - url: http://localhost:8080
+    description: Backend local (./mvnw spring-boot:run)
+# API publique par défaut (security vide) : les endpoints sécurisés déclareront
+# explicitement un securityScheme (ex. bearerAuth) lorsqu'il sera implémenté.
+security: []
+tags:
+  - name: Items
+    description: Ressource d'exemple — à remplacer par les ressources du domaine réel.
+paths:
+  /api/items:
+    get:
+      tags: [Items]
+      operationId: listItems
+      summary: Lister les items (pagination)
+      parameters:
+        - name: page
+          in: query
+          description: Numéro de page (0-based)
+          schema: { type: integer, minimum: 0, default: 0 }
+        - name: size
+          in: query
+          description: Taille de page
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        "200":
+          description: Page d'items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemPage"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+    post:
+      tags: [Items]
+      operationId: createItem
+      summary: Créer un item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemInput"
+      responses:
+        "201":
+          description: Item créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+  /api/items/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer, format: int64 }
+    get:
+      tags: [Items]
+      operationId: getItem
+      summary: Récupérer un item par son identifiant
+      responses:
+        "200":
+          description: Item trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Items]
+      operationId: updateItem
+      summary: Modifier un item existant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemInput"
+      responses:
+        "200":
+          description: Item mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Items]
+      operationId: deleteItem
+      summary: Supprimer un item
+      responses:
+        "204":
+          description: Item supprimé
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  responses:
+    ValidationError:
+      description: Requête invalide (échec de validation des données)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Item:
+      type: object
+      description: Ressource d'exemple (à remplacer par le domaine réel).
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Date de création (ISO 8601, UTC)
+    ItemInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+    ItemPage:
+      type: object
+      required: [content, page, size, totalElements]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Item"
+        page: { type: integer, minimum: 0 }
+        size: { type: integer, minimum: 1 }
+        totalElements: { type: integer, minimum: 0 }
+    Error:
+      type: object
+      description: Enveloppe d'erreur commune à toutes les réponses en échec.
+      required: [status, message, timestamp]
+      properties:
+        status: { type: integer, description: Code HTTP }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
