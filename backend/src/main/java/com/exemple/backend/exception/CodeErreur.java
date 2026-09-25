@@ -1,8 +1,9 @@
-package com.exemple.backend.entity;
+package com.exemple.backend.exception;
 
 /**
  * Codes d'erreur metier renvoyes dans l'enveloppe "Error" commune
- * (voir CAHIER_DES_CHARGES.md section 4 et le format d'erreur homogene ENF3).
+ * (ENF3) : chaque echec porte son code (CODE_EXPIRE, DEJA_PRESENT, ...)
+ * en plus du statut HTTP.
  */
 public enum CodeErreur {
 
