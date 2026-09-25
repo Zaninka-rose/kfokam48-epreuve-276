@@ -28,3 +28,10 @@ INSERT INTO etudiant (id, nom, promotion_id) VALUES
 -- Code saisi par l'etudiant pour marquer sa presence : DEMO1234.
 INSERT INTO session (id, formateur_id, code, ouverture, expiration_code, cloturee) VALUES
     (1, 900, 'DEMO1234', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '15' MINUTE, FALSE);
+
+-- Les identifiants etant inseres explicitement, on replace les sequences
+-- IDENTITY apres eux (syntaxe commune H2 / PostgreSQL) pour que les
+-- prochains INSERT applicatifs ne entrent pas en conflit de cle primaire.
+ALTER TABLE promotion ALTER COLUMN id RESTART WITH 2;
+ALTER TABLE etudiant ALTER COLUMN id RESTART WITH 11;
+ALTER TABLE session ALTER COLUMN id RESTART WITH 2;
