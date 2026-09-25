@@ -1,23 +1,10 @@
 # Diagrammes
 
-Déposer ici les diagrammes du projet, un fichier par diagramme.
+Analyse dérivée de `docs/CAHIER_DES_CHARGES.md` et du contrat `api/contrat.yaml`.
+Rendus en [Mermaid](https://mermaid.js.org/) — visibles directement dans l'aperçu GitHub.
 
-- Formats admis : Mermaid (`.md` ou `.mmd`) ou PlantUML (`.puml`).
-- Convention de nommage : `<type>-<sujet>.<ext>` (ex. `sequence-authentification.md`).
-
-| Type | Sujet | Statut |
+| Réf | Fichier | Contenu |
 |---|---|---|
-| Contexte | Acteurs et systèmes externes | À faire |
-| Cas d'utilisation | Périmètre fonctionnel | À faire |
-| Séquence | Flux principaux (un par cas d'usage clé) | À faire |
-| Classes / Modèle de données | Entités du domaine | À faire |
-| Déploiement | Environnements | À faire |
-
-## Architecture cible (exemple)
-
-```mermaid
-graph LR
-  U[Utilisateur] --> F[Frontend Angular 22 :4200]
-  F -- HTTP /api selon api/contrat.yaml --> B[Backend Spring Boot :8080]
-  B --> D[(Base de données)]
-```
+| D1 | [`D1-cas-utilisation.md`](D1-cas-utilisation.md) | Acteurs (formateur, étudiant, relecteur, système) et cas d'utilisation, tracés vers EF1–EF12 et RG1–RG13 |
+| D2 | [`D2-classes.md`](D2-classes.md) | Classes du domaine, énumérations de statuts et règles de gestion associées |
+| D3 | [`D3-sequence.md`](D3-sequence.md) | Scénario nominal complet (présence → dépôt → relecture → tableau de bord) et alternative de clôture |
