@@ -1,3 +1,10 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { OuvrirSession } from './ouvrir-session/ouvrir-session';
+
+export const routes: Routes = [
+	{
+		path: 'ouvrir-session',
+		component: OuvrirSession,
+	},
+];
