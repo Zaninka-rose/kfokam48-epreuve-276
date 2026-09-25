@@ -133,6 +133,8 @@ public class RelectureService {
 	/** EF10 : tableau de bord formateur, par etudiant. */
 	@Transactional(readOnly = true)
 	public List<LigneTableau> tableau(Long sessionId) {
+		sessions.findById(sessionId)
+				.orElseThrow(() -> new RegleMetierException(CodeErreur.INTROUVABLE, "Session inconnue"));
 		List<Presence> presents = presences.findBySessionId(sessionId);
 		List<Exercice> deposees = exercices.findBySessionId(sessionId);
 		Map<Long, Exercice> parAuteur = deposees.stream()
@@ -148,9 +150,9 @@ public class RelectureService {
 
 	private LigneTableau ligne(Long sessionId, Long etudiantId, List<Presence> presents, Exercice exercice) {
 		long nbPresences = presents.stream().filter(p -> p.getEtudiantId().equals(etudiantId)).count();
-		long enAttente = relectures.findByExerciceSessionId(sessionId).stream()
-				.filter(r -> exercice == null || !r.getExercice().getId().equals(exercice.getId()))
-				.count();
+		// RG9 : "relectures en attente" = exercices de l'etudiant non encore relus
+		// (en attente d'assignation ou en attente de relecture).
+		long enAttente = exercice != null && exercice.getStatut() != StatutExercice.RELUE ? 1 : 0;
 		Double moyenne = null;
 		if (exercice != null && exercice.getStatut() == StatutExercice.RELUE) {
 			moyenne = relectures.findByExerciceId(exercice.getId()).map(Relecture::getNote).stream()
