@@ -1,6 +1,4 @@
-package com.exemple.backend.service;
-
-import com.exemple.backend.entity.CodeErreur;
+package com.exemple.backend.exception;
 
 /**
  * Exception metier portant un code de l'enveloppe d'erreur homogene (ENF3/B4).

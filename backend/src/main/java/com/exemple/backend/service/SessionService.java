@@ -1,6 +1,6 @@
 package com.exemple.backend.service;
 
-import com.exemple.backend.entity.CodeErreur;
+import com.exemple.backend.exception.CodeErreur;
 import com.exemple.backend.entity.Presence;
 import com.exemple.backend.entity.Session;
 import com.exemple.backend.entity.SourcePresence;
@@ -8,7 +8,7 @@ import com.exemple.backend.entity.TentativeCode;
 import com.exemple.backend.repository.PresenceRepository;
 import com.exemple.backend.repository.SessionRepository;
 import com.exemple.backend.repository.TentativeCodeRepository;
-import com.exemple.backend.service.RegleMetierException;
+import com.exemple.backend.exception.RegleMetierException;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.time.Duration;

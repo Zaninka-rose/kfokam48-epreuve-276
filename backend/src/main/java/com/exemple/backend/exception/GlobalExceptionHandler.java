@@ -1,6 +1,5 @@
 package com.exemple.backend.exception;
 
-import com.exemple.backend.service.RegleMetierException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
